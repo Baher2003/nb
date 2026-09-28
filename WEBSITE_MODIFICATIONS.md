@@ -56,6 +56,8 @@ Update status and Change History
 
 ## 2.1 Independent URL/Route for Every Page
 
+> **Status: COMPLETED (2026-09-28)** — Implemented via URL routing layer (`src/lib/url-router.ts` + catch-all route `src/app/[[...slug]]/page.tsx` + `<UrlRouter>` sync component). Route map: `/` landing, `/login`, `/register`, `/dashboard`, `/statistics`, `/notifications`, `/arena` (+ `?tab=` for the 5 lobby tabs), `/arena/match/{id}`, `/arena/robot/{id}`, `/training/{game}` (addition_subtraction | multiplication | division | abacus), `/training/{game}/play`, `/admin/{section}` (students | arena | trainers | money | notifications | statistics). Unknown routes render a friendly 404 page. Deep links, shareable URLs, and history entries verified end-to-end in the browser.
+
 ### Problem
 
 The current website behaves too much like a single-page interface where multiple sections/pages are connected to one main URL instead of behaving like independent website pages.
@@ -103,6 +105,8 @@ These are examples only. Apply the same routing principle to **all actual pages 
 ---
 
 ## 2.2 Browser and Mobile Back Navigation
+
+> **Status: COMPLETED (2026-09-28)** — All in-app navigation now creates real browser history entries (`router.push`); auth transitions and guards use `router.replace` (no dead pages trapped in history). Verified: admin sections Back/Forward cycling, arena ↔ dashboard Back/Forward, error-card → arena, 404 → home. Duplicate-entry protection: same-identity navigation is a no-op; arena tabs use `history.replaceState` so they never flood history.
 
 The Back action must behave like a normal website.
 
@@ -152,6 +156,8 @@ And so on.
 
 ## 2.3 Refresh Must Preserve the Current Page
 
+> **Status: COMPLETED (2026-09-28)** — The URL is the source of truth on boot: the view is restored from the pathname before/while the session resolves, and deep links win over role-home redirects. Verified: refresh on `/admin/money` stays on the money panel; refresh on `/arena?tab=leaderboard` keeps the leaderboard tab selected; refresh mid-training (`/training/{game}/play`) falls back to the same training's setup screen; guests refreshing a protected page land on `/login` with the dead-session notice.
+
 When the user is on a specific page and presses Refresh/Reload, the same page must be reloaded.
 
 ### Example
@@ -193,6 +199,8 @@ unless the application explicitly requires authentication and the user is not au
 ---
 
 # 3. UI / UX / Responsive Design Overhaul
+
+> **Status: AUDITED (2026-09-28)** — Full-route sweep at 360/390/768/1440/1920 px on `/`, `/login`, `/register`, `/dashboard`, `/arena`, `/training/*`, `/statistics`, `/notifications`, `/xyz` (404): zero horizontal overflow, footer bottom-anchored, headings render on every route. Fixed during this pass: unreachable match/robot error screens (error card was shadowed by the loading branch — now reachable via deep links, first); controlled arena tabs with RTL-safe layout. The app remains Arabic RTL-first (`dir="rtl"`) with logical-property spacing.
 
 ## 3.1 Current UI Problems
 
@@ -338,6 +346,8 @@ Any structural refactor must preserve the existing behavior unless a newer requi
 
 # 6. Validation Checklist
 
+> **Status: EXECUTED (2026-09-28)** — All routing/history/refresh/UI/responsive items verified in-browser (Chromium via agent-browser) on the sandbox deployment, then re-verified on the live Vercel deployment after release. API-level regression: comprehensive suite 58/58 PASS.
+
 After implementation, verify all of the following:
 
 ### Routing
@@ -446,4 +456,5 @@ Whenever a new change request is provided:
 | Date | Change | Status |
 |---|---|---|
 | 2026-09-28 | Initial requirements: independent routes, browser/mobile Back navigation, refresh-current-page behavior, responsive UI overhaul, layout fixes, RTL/LTR corrections, and validation rules. | ACTIVE |
+| 2026-09-28 | Implemented §2.1–2.3 + §3 audit + §6 validation: URL routing layer (`src/lib/url-router.ts`), catch-all app route with URL↔store sync (`src/app/[[...slug]]/page.tsx`), admin sections at `/admin/{section}`, arena tabs at `?tab=`, deep-link-safe auth transitions in `app-store`, friendly 404, fixed unreachable match/robot error screens. Regression 58/58 PASS. Deployed to production. | COMPLETED |
 
